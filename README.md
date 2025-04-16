@@ -1,6 +1,5 @@
-# 🧶 Malibu Ateliê
-
 <div align="center">
+<h1>🧶 Malibu Ateliê</h1>
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
@@ -102,7 +101,7 @@ Malibu-Atelie/
 - **Papel:** Tech Lead / Product Owner (PO)
 - **Responsabilidades:** Organização geral e direção técnica
 
-### 🎨 Juninho
+### 🎨 José Zildemar
 - **Papel:** Designer UI/UX
 - **Responsabilidades:** Prototipação e design de interface
 
@@ -144,35 +143,62 @@ npm run dev
 
 ## 📝 Commits
 
-Utilizamos os seguintes prefixos nos commits:
+### Estrutura do Commit
 
+```bash
+<emoji> <tipo>(<escopo>): <descrição>
+```
+#### Exemplo:
+```bash
+✨ feat(auth): implementar autenticação com Firebase
+```
+
+- **emoji:** Identificador visual do tipo de mudança
+- **tipo:** Identifica a natureza da mudança (feat, fix, etc)
+- **escopo:** Indica a parte do projeto afetada (opcional)
+- **descrição:** Mensagem clara e direta no infinitivo
+
+### Prefixos (tipos)
 - ✨ `feat:` Nova funcionalidade
 - 🔨 `refac:` Refatoração
 - 🐛 `fix:` Correção de bugs
 - 📚 `docs:` Documentação
 - 💅 `style:` Estilo e formatação
 
+### Escopos Comuns
+- `auth` - Autenticação
+- `admin` - Painel administrativo
+- `products` - Gerenciamento de produtos
+- `ui` - Interface do usuário
+- `api` - Endpoints da API
+- `db` - Banco de dados
+- `tests` - Testes
+
 ### 📋 Exemplos de Commits
 
-#### Nova Funcionalidade
+#### ✨ Nova Funcionalidade
 ```bash
-git commit -m "feat: implementar funcionalidade de login de usuário"
+git commit -m "✨ feat(auth): implementar login com Google"
 ```
-#### Refatoração
+
+#### 🔨 Refatoração
 ```bash
-git commit -m "refac: refatorar estrutura de controle de login"
+git commit -m "🔨 refac(api): reorganizar estrutura de rotas"
 ```
-#### Correção de Bug
+
+#### 🐛 Correção de Bug
 ```bash
-git commit -m "fix: corrigir erro de login com e-mail inválido"
+git commit -m "🐛 fix(ui): corrigir responsividade do menu"
 ```
-#### Documentação
+
+#### 📚 Documentação
 ```bash
-git commit -m "docs: atualizar README com novos requisitos"
+git commit -m "📚 docs(api): atualizar documentação dos endpoints"
 ```
-#### Estilo
+
+#### 💅 Estilo
 ```bash
-git commit -m "style: corrigir formatação de código no modelo de usuário"
+git commit -m "💅 style(ui): ajustar padrões de cores e tipografia"
 ```
 
 ## 🌲 Branches
