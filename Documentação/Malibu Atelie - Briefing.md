@@ -1,9 +1,3 @@
----
-tags:
-  - Universidade
-materia: Projeto 2
-tipo: Atividade
----
 # Informações sobre o cliente
 1. Nome do cliente: **Pricila Costa**
 2. Nome da empresa: **Malibu Atelié**
@@ -51,4 +45,5 @@ tipo: Atividade
 
 - [Favorito Croche](https://www.favoritocroche.com.br/?fbclid=PAZXh0bgNhZW0CMTEAAaeDIZLoJ9IrrLhc6WgzNphOQEjVtzsUHzjPX_xE0EKG_3sUBwSy9T5UTlkCkw_aem_Pdzcu7RuZ6XCa0Y2YDqWMg)
 - Paleta de Cores e Fontes
-![[WhatsApp Image 2025-04-09 at 20.44.29 1.jpeg]]
+
+![Paleta de Cores Malibu Ateliê](../assets/paleta-cores.png)
