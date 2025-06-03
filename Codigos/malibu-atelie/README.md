@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Documentação da API – Malibu Ateliê
 
-## Getting Started
+> URL base (ambiente local): `http://localhost:3000`
 
-First, run the development server:
+Todas as rotas autenticadas exigem o cabeçalho `Authorization` com um JWT:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+Authorization: Bearer <seu-token-aqui>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Auth
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```http
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+```
 
-## Learn More
+```json
+    {
+    	"email": "teste@email.com",
+      "password": "123456"
+    }
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Register
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```http
+POST http://localhost:3000/api/register
+Content-Type: application/json
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```json
+    {
+      "name": "teste",
+      "email": "teste@email.com",
+      "password": "123456"
+    }
+```
 
-## Deploy on Vercel
+## Users
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### List Users
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```http
+GET http://localhost:3000/api/users
+Authorization: Bearer <seu-token-aqui>
+```
+
+### Search User
+
+```http
+GET http://localhost:3000/api/users/1
+Authorization: Bearer <seu-token-aqui>
+```
+
+### Update User
+
+```http
+PATCH http://localhost:3000/api/users/2
+Authorization: Bearer <seu-token-aqui>
+Content-Type: application/json
+```
+
+```json
+    {
+      "name": "Teste Dev"
+    }
+```
+
+### Update User
+
+```http
+PUT http://localhost:3000/api/users/2
+Authorization: Bearer <seu-token-aqui>
+Content-Type: application/json
+```
+
+```json
+    {
+      "name": "teste_2",
+      "email": "teste@email.com",
+      "password": "123456"
+    }
+```
+
+### Delete User
+
+```http
+DELETE http://localhost:3000/api/users/2
+Authorization: Bearer <seu-token-aqui>
+```
+
+## Products
+
+### Create Category
+
+```http
+POST http://localhost:3000/api/categories
+Authorization: Bearer <seu-token-aqui>
+Content-Type: application/json
+```
+
+```json
+    {
+      "name": "Praia"
+    }
+```
+
+### Create Product
+
+```http
+POST http://localhost:3000/api/products
+Authorization: Bearer <seu-token-aqui>
+Content-Type: application/json
+```
+
+```json
+    {
+      "name": "Produto Teste Delete",
+      "description": "Descrição teste Delete",
+      "price": 10.99,
+      "image": "https://crocheparavendermais.com/wp-content/uploads/2020/10/coisas-de-croche-para-vender.jpg",
+      "categoryId": 1
+    }
+```
+
+### List Products
+
+```http
+GET http://localhost:3000/api/products
+```
+
+### Update Product
+
+```http
+PUT http://localhost:3000/api/products/8
+Authorization: Bearer <seu-token-aqui>
+Content-Type: application/json
+```
+
+```json
+    {
+      "name": "Produto Teste Atualização",
+      "description": "Descrição teste",
+      "price": 99.99,
+      "image": "https://crocheparavendermais.com/wp-content/uploads/2020/10/coisas-de-croche-para-vender.jpg",
+      "categoryId": 1
+    }
+```
+
+### Delete Product
+
+```http
+DELETE http://localhost:3000/api/products/9
+Authorization: Bearer <seu-token-aqui>
+```
