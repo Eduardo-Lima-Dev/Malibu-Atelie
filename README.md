@@ -9,18 +9,19 @@
 
 ## 📑 Sumário
 
-- [Introdução](#introdução)
-- [Descrição do Projeto](#descrição-do-projeto)
-- [Objetivos](#objetivos)
-- [Funcionalidades](#funcionalidades)
-- [Tecnologias](#tecnologias)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Time](#time)
-- [Comunicação](#comunicação)
-- [Setup](#setup)
-- [Commits](#commits)
-- [Branches](#branches)
-- [Contato](#contato)
+- [🎯 Introdução](#-introdução)
+- [💫 Descrição do Projeto](#-descrição-do-projeto)
+- [⭐ Objetivos](#-objetivos)
+- [🛠️ Funcionalidades](#️-funcionalidades)
+- [💻 Tecnologias](#-tecnologias)
+- [📁 Estrutura do Projeto](#-estrutura-do-projeto)
+- [👥 Time](#-time)
+- [🤝 Comunicação](#-comunicação)
+- [🚀 Setup](#-setup)
+- [📚 Documentação da API](#-documentação-da-api)
+- [📝 Commits](#-commits)
+- [🌲 Branches](#-branches)
+- [📞 Contato](#-contato)
 
 ## 🎯 Introdução
 
@@ -119,27 +120,74 @@ Malibu-Atelie/
 
 ### Pré-requisitos
 
-- ✨ Node.js
-- 🔥 Conta Firebase
-- 📦 Git
+* ✨ Node.js
+* 📦 Git
+* 🐘 PostgreSQL
+* 🔧 Prisma CLI
 
 ### Instalação
 
-1. **Clone o repo:**
+1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/malibu-atelie.git
+git clone https://github.com/Eduardo-Lima-Dev/Malibu-Atelie.git
+cd Malibu-Atelie/Codigos/malibu-atelie
 ```
 
-2. **Instale dependências:**
+2. **Instale as dependências:**
 ```bash
-cd Codigos/frontend
 npm install
 ```
 
-3. **Rode o projeto:**
+3. **Configure as variáveis de ambiente:**
+
+```bash
+# Edite o arquivo .env com suas configurações
+DATABASE_URL="postgresql://seu_usuario:sua_senha@localhost:5432/malibu_atelie"
+NEXTAUTH_SECRET="sua_chave_secreta_aqui"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+4. **Configure o banco de dados:**
+
+#### Crie o banco de dados PostgreSQL
+```bash
+createdb malibu_atelie
+```
+##### Execute as migrações do Prisma
+```bash
+npx prisma migrate dev
+```
+##### Gere o cliente Prisma
+```bash
+npx prisma generate
+```
+
+5. **Inicie o servidor de desenvolvimento:**
 ```bash
 npm run dev
 ```
+
+O projeto estará disponível em `http://localhost:3000`
+
+### Comandos Úteis
+
+```bash
+# Visualizar o banco de dados com Prisma Studio
+npx prisma studio
+```
+
+```bash
+# Criar uma nova migração
+npx prisma migrate dev --name nome_da_migracao
+```
+```bash
+# Resetar o banco de dados
+npx prisma migrate reset
+```
+
+## 📚 Documentação da API
+
+A documentação completa da API pode ser encontrada em [`/Codigos/malibu-atelie/README.md`](/Codigos/malibu-atelie/README.md). Ela contém todos os detalhes sobre os endpoints disponíveis, autenticação e exemplos de uso.
 
 ## 📝 Commits
 
@@ -254,6 +302,7 @@ git push origin Feature-Nova-Funcionalidade
 ```
 
 4. **Abra um Pull Request para a `main`**
+
 
 ---
 
