@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
+import { compare } from 'bcryptjs'
 import { SignJWT } from 'jose'
 
 export async function POST(req: NextRequest) {
@@ -15,9 +15,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    console.log('Buscando usuário com email:', email)
     const user = await prisma.user.findUnique({
       where: { email }
     })
+
+    console.log('Usuário encontrado:', user)
 
     if (!user) {
       return NextResponse.json(
@@ -26,9 +29,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password)
+    const passwordMatch = await compare(password, user.password)
 
-    if (!isPasswordValid) {
+    if (!passwordMatch) {
       return NextResponse.json(
         { error: 'Senha incorreta' },
         { status: 401 }
@@ -43,28 +46,27 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Criar o token JWT usando jose
+    console.log('Gerando token para usuário:', user.id)
     const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET)
-    
-    const token = await new SignJWT({
+    const token = await new SignJWT({ 
       id: user.id,
       email: user.email,
       name: user.name
     })
       .setProtectedHeader({ alg: 'HS256' })
-      .setExpirationTime('30d')
+      .setExpirationTime('24h')
       .sign(secret)
 
+    console.log('Token gerado com sucesso')
+
+    const { password: _, ...userWithoutPassword } = user
+
     return NextResponse.json({
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email
-      }
+      user: userWithoutPassword,
+      token
     })
   } catch (error) {
-    console.error('Erro na autenticação:', error)
+    console.error('Erro ao fazer login:', error)
     return NextResponse.json(
       { error: 'Erro interno do servidor' },
       { status: 500 }
