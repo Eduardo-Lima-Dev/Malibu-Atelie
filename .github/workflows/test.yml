@@ -51,10 +51,10 @@ jobs:
         echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
       working-directory: Codigos/malibu-atelie
 
-    - name: Limpar Banco de Dados
+    - name: Dropar e Recriar Banco de Dados
       run: |
-        npx prisma migrate reset --force
-        npx prisma db push --force-reset
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS malibu_test;"
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE malibu_test;"
       working-directory: Codigos/malibu-atelie
 
     - name: Aplicar Migrações do Prisma
