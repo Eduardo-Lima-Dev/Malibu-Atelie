@@ -33,6 +33,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'npm'
+        cache-dependency-path: 'Codigos/malibu-atelie/package-lock.json'
 
     - name: Navegar para o diretório do projeto
       run: cd Codigos/malibu-atelie
