@@ -217,3 +217,7 @@ Cada arquivo de teste inclui:
 3. Adicione novos testes ao implementar novas funcionalidades
 4. Use dados de teste isolados para cada teste
 5. Limpe o banco de dados após cada teste
+
+## Testes Automatizados
+
+Os testes são executados automaticamente através do GitHub Actions em todas as branches do repositório.
