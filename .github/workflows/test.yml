@@ -25,6 +25,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malibu_test
+      NEXTAUTH_SECRET: xhrzNhtawuVGw6cbWEWePuwgyMzr1qzLDjd/Vay07D4=
+      NEXTAUTH_URL: http://localhost:3000
+
     steps:
     - uses: actions/checkout@v3
 
@@ -55,6 +60,4 @@ jobs:
 
     - name: Rodar Testes
       run: npm test
-      working-directory: Codigos/malibu-atelie
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malibu_test 
+      working-directory: Codigos/malibu-atelie 
