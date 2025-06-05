@@ -51,8 +51,10 @@ jobs:
         echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
       working-directory: Codigos/malibu-atelie
 
-    - name: Resetar Banco de Dados
-      run: npx prisma migrate reset --force
+    - name: Limpar Banco de Dados
+      run: |
+        npx prisma migrate reset --force
+        npx prisma db push --force-reset
       working-directory: Codigos/malibu-atelie
 
     - name: Aplicar Migrações do Prisma
@@ -77,5 +79,6 @@ jobs:
       working-directory: Codigos/malibu-atelie
 
     - name: Rodar Testes
-      run: npm test
+      run: |
+        npm test -- --runInBand
       working-directory: Codigos/malibu-atelie 
