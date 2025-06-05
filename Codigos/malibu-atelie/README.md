@@ -210,14 +210,6 @@ Cada arquivo de teste inclui:
 - Verificações de autenticação
 - Validações de dados
 
-### Boas Práticas
-
-1. Sempre execute os testes antes de fazer commit
-2. Mantenha a cobertura de testes acima de 80%
-3. Adicione novos testes ao implementar novas funcionalidades
-4. Use dados de teste isolados para cada teste
-5. Limpe o banco de dados após cada teste
-
 ## Testes Automatizados
 
 Os testes são executados automaticamente através do GitHub Actions em todas as branches do repositório.
