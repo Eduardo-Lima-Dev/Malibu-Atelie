@@ -212,4 +212,4 @@ Cada arquivo de teste inclui:
 
 ## Testes Automatizados
 
-Os testes são executados automaticamente através do GitHub Actions em todas as branches do repositório.
+Os testes são executados automaticamente através do GitHub Actions em todas as branches do repositório.# Teste do GitHub Actions

@@ -1,0 +1,84 @@
+name: Testes Automatizados
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: malibu_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/malibu_test
+      NEXTAUTH_SECRET: xhrzNhtawuVGw6cbWEWePuwgyMzr1qzLDjd/Vay07D4=
+      NEXTAUTH_URL: http://localhost:3000
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'Codigos/malibu-atelie/package-lock.json'
+
+    - name: Instalar Dependências
+      run: npm ci
+      working-directory: Codigos/malibu-atelie
+
+    - name: Configurar Banco de Dados de Teste
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/malibu_test" > .env.test
+        echo "NEXTAUTH_SECRET=xhrzNhtawuVGw6cbWEWePuwgyMzr1qzLDjd/Vay07D4=" >> .env.test
+        echo "NEXTAUTH_URL=http://localhost:3000" >> .env.test
+      working-directory: Codigos/malibu-atelie
+
+    - name: Dropar e Recriar Banco de Dados
+      run: |
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS malibu_test;"
+        PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE malibu_test;"
+      working-directory: Codigos/malibu-atelie
+
+    - name: Aplicar Migrações do Prisma
+      run: npx prisma migrate deploy
+      working-directory: Codigos/malibu-atelie
+
+    - name: Iniciar Servidor em Background
+      run: npm run dev &
+      working-directory: Codigos/malibu-atelie
+
+    - name: Esperar Servidor Iniciar
+      run: |
+        timeout=30
+        while ! curl -s http://localhost:3000 > /dev/null; do
+          sleep 1
+          timeout=$((timeout-1))
+          if [ $timeout -le 0 ]; then
+            echo "Timeout esperando o servidor iniciar"
+            exit 1
+          fi
+        done
+      working-directory: Codigos/malibu-atelie
+
+    - name: Rodar Testes
+      run: |
+        npm test -- --runInBand
+      working-directory: Codigos/malibu-atelie 
