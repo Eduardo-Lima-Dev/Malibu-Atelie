@@ -7,9 +7,12 @@ import { jwtVerify } from 'jose'
 import { Prisma } from '@prisma/client'
 import { Decimal } from 'decimal.js'
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   const product = await prisma.product.findUnique({
-    where: { id: Number(params.id) }
+    where: { id: Number(params.id) },
   })
   if (!product) {
     return NextResponse.json({ error: 'Produto não encontrado' }, { status: 404 })
