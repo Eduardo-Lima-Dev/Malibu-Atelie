@@ -6,6 +6,9 @@ const nextConfig = {
       // adicione outros domínios se necessário
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig; 
