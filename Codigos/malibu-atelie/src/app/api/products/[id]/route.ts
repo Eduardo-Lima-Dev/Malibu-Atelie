@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { productSchema } from '@/lib/validation/product'
 import { getServerSession } from 'next-auth'
@@ -7,7 +7,7 @@ import { jwtVerify } from 'jose'
 import { Prisma } from '@prisma/client'
 import { Decimal } from 'decimal.js'
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   const product = await prisma.product.findUnique({
     where: { id: Number(params.id) }
   })
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json(product)
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
     const authHeader = req.headers.get('authorization')
     console.log('Authorization header:', authHeader)
@@ -123,10 +123,7 @@ async function verifyToken(token: string) {
 }
 
 // Atualizar um produto
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
     const authHeader = req.headers.get('authorization')
     console.log('Authorization header:', authHeader)
@@ -254,7 +251,7 @@ export async function PUT(
   }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
     return NextResponse.json({ error: 'Não autenticado' }, { status: 401 })
