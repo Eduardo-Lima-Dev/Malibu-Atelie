@@ -10,9 +10,26 @@ interface Produto {
   id: number
   name: string
   price: number | string
-  image: string
   description?: string
   categoryId?: number
+  images: { url: string, filename: string }[]
+}
+
+// Modal de confirmação simples
+function ModalConfirmarExclusao({ open, onClose, onConfirm, produto }: { open: boolean, onClose: () => void, onConfirm: () => void, produto?: Produto | null }) {
+  if (!open || !produto) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm relative">
+        <h2 className="text-lg font-bold mb-4">Confirmar exclusão</h2>
+        <p className="mb-6">Deseja realmente excluir o produto <span className="font-semibold">{produto.name}</span>?</p>
+        <div className="flex justify-end gap-2">
+          <button className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300" onClick={onClose}>Cancelar</button>
+          <button className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600" onClick={onConfirm}>Excluir</button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function DashboardPage() {
@@ -23,6 +40,8 @@ export default function DashboardPage() {
   const [produtoEdicao, setProdutoEdicao] = useState<Produto | null>(null)
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [modalConfirmOpen, setModalConfirmOpen] = useState(false)
+  const [produtoExcluir, setProdutoExcluir] = useState<Produto | null>(null)
 
   async function fetchProdutos() {
     setLoading(true)
@@ -64,6 +83,22 @@ export default function DashboardPage() {
     fetchProdutos()
   }
 
+  async function handleExcluirProduto() {
+    if (!produtoExcluir) return
+    try {
+      const res = await fetch(`/api/products/${produtoExcluir.id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+      })
+      if (!res.ok) throw new Error('Erro ao excluir produto')
+      setModalConfirmOpen(false)
+      setProdutoExcluir(null)
+      fetchProdutos()
+    } catch (e) {
+      alert('Erro ao excluir produto')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f8fafd] flex flex-col md:flex-row">
       <aside className="bg-white border-b md:border-b-0 md:border-r w-full md:w-64 flex flex-row md:flex-col gap-4 md:gap-8 p-4 md:p-8 items-center md:items-start justify-between md:justify-start">
@@ -101,7 +136,15 @@ export default function DashboardPage() {
                   {produtosPagina.map(produto => (
                     <tr key={produto.id} className="border-b last:border-0">
                       <td className="py-2 px-2">
-                        <img src={produto.image} alt={produto.name} className="w-16 h-16 object-cover rounded" />
+                        {produto.images && produto.images.length > 0 ? (
+                          <img
+                            src={produto.images[0].url}
+                            alt={produto.name}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                        ) : (
+                          <span className="text-gray-400 italic">Sem imagem</span>
+                        )}
                       </td>
                       <td className="py-2 px-2">{produto.name}</td>
                       <td className="py-2 px-2">
@@ -110,7 +153,7 @@ export default function DashboardPage() {
                         </button>
                       </td>
                       <td className="py-2 px-2">
-                        <button className="text-red-500 hover:text-red-700" title="Excluir">
+                        <button className="text-red-500 hover:text-red-700" title="Excluir" onClick={() => { setProdutoExcluir(produto); setModalConfirmOpen(true); }}>
                           <FiTrash2 size={20} />
                         </button>
                       </td>
@@ -129,6 +172,7 @@ export default function DashboardPage() {
           )}
         </div>
         <ModalCadastrarProduto open={modalOpen} onClose={handleFecharModal} onProdutoCriado={fetchProdutos} produtoEdicao={produtoEdicao} />
+        <ModalConfirmarExclusao open={modalConfirmOpen} onClose={() => { setModalConfirmOpen(false); setProdutoExcluir(null); }} onConfirm={handleExcluirProduto} produto={produtoExcluir} />
       </main>
     </div>
   )

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { FiPlus } from 'react-icons/fi'
 
 interface Categoria {
@@ -13,7 +13,6 @@ interface ProdutoEdicao {
   name: string
   description?: string
   price: number | string
-  image: string
   categoryId?: number
 }
 
@@ -34,27 +33,34 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
     name: '',
     description: '',
     price: '',
-    image: '',
     categoryId: ''
   })
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
+  const [fileName, setFileName] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [images, setImages] = useState<{ filename: string, url: string }[]>([])
+  const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (open) {
       buscarCategorias()
       setShowCriarCategoria(false)
+      setFileName(null)
+      setImages([])
       if (produtoEdicao) {
         setForm({
           name: produtoEdicao.name || '',
           description: produtoEdicao.description || '',
           price: String(produtoEdicao.price ?? ''),
-          image: produtoEdicao.image || '',
           categoryId: produtoEdicao.categoryId ? String(produtoEdicao.categoryId) : ''
         })
+        // Para edição, vamos carregar as imagens do produto se existirem
+        // Por enquanto, vamos deixar vazio até implementar a busca das imagens
+        setImages([])
       } else {
-        setForm({ name: '', description: '', price: '', image: '', categoryId: '' })
+        setForm({ name: '', description: '', price: '', categoryId: '' })
       }
     }
   }, [open, produtoEdicao])
@@ -109,8 +115,17 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
     setLoading(true)
     setErro('')
     setSucesso('')
+    if (images.length === 0) {
+      setErro('Selecione uma imagem para o produto.')
+      setLoading(false)
+      return
+    }
     try {
       let res
+      const body = {
+        ...form,
+        images,
+      }
       if (produtoEdicao) {
         // Edição
         res = await fetch(`/api/products/${produtoEdicao.id}`, {
@@ -119,13 +134,7 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
           },
-          body: JSON.stringify({
-            name: form.name,
-            description: form.description,
-            price: Number(form.price),
-            image: form.image,
-            categoryId: Number(form.categoryId)
-          })
+          body: JSON.stringify(body)
         })
       } else {
         // Criação
@@ -135,18 +144,13 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
           },
-          body: JSON.stringify({
-            name: form.name,
-            description: form.description,
-            price: Number(form.price),
-            image: form.image,
-            categoryId: Number(form.categoryId)
-          })
+          body: JSON.stringify(body)
         })
       }
       if (!res.ok) throw new Error(produtoEdicao ? 'Erro ao editar produto' : 'Erro ao criar produto')
       setSucesso(produtoEdicao ? 'Produto editado com sucesso!' : 'Produto cadastrado com sucesso!')
-      setForm({ name: '', description: '', price: '', image: '', categoryId: '' })
+      setForm({ name: '', description: '', price: '', categoryId: '' })
+      setImages([])
       onProdutoCriado?.()
     } catch (e) {
       setErro(produtoEdicao ? 'Erro ao editar produto' : 'Erro ao criar produto')
@@ -173,11 +177,80 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Preço</label>
-            <input type="number" step="0.01" className="w-full border rounded px-3 py-2" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} required />
+            <input
+              type="text"
+              inputMode="decimal"
+              className="w-full border rounded px-3 py-2"
+              value={form.price ? Number(form.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}
+              onChange={e => {
+                // Remove tudo que não for número
+                const raw = e.target.value.replace(/[^\d]/g, '');
+                // Divide por 100 para ter centavos
+                const valor = raw ? (parseInt(raw, 10) / 100).toFixed(2) : '';
+                setForm(f => ({ ...f, price: valor }));
+              }}
+              required
+              placeholder="R$ 0,00"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Imagem (URL)</label>
-            <input type="url" className="w-full border rounded px-3 py-2" value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} required />
+            <label className="block text-sm font-medium mb-1">Imagem</label>
+            <label
+              className="flex flex-col items-center justify-center border-2 border-dashed border-[#3d4fc5] rounded-lg p-4 cursor-pointer hover:bg-[#f5f7ff] transition"
+              htmlFor="file-upload"
+            >
+              <FiPlus size={32} className="text-[#3d4fc5] mb-2" />
+              <span className="text-[#3d4fc5] font-medium">
+                Clique para selecionar uma imagem
+              </span>
+              <input
+                ref={inputFileRef}
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onClick={e => { (e.target as HTMLInputElement).value = ''; }}
+                onChange={async (e) => {
+                  console.log('onChange disparado', e.target.files);
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploading(true);
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  console.log('Antes do fetch');
+                  const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    }
+                  });
+                  console.log('Depois do fetch');
+                  const data = await res.json();
+                  console.log('Upload response:', data);
+                  if (data.url) {
+                    setFileName(file.name);
+                    setImages(imgs => [...imgs, { filename: file.name, url: data.url }]);
+                  } else {
+                    setErro('Erro ao fazer upload da imagem.');
+                  }
+                  setUploading(false);
+                }}
+              />
+              {uploading && <span className="text-xs text-gray-500 mt-2">Enviando imagem...</span>}
+              {images.length > 0 && (
+                <div className="flex flex-col items-center mt-4">
+                  <img
+                    src={images[0].url}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded border mb-2"
+                  />
+                  {fileName && (
+                    <span className="text-xs text-gray-600">{fileName}</span>
+                  )}
+                </div>
+              )}
+            </label>
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Categoria</label>

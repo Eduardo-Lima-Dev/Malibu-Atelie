@@ -12,7 +12,7 @@ export default function Catalogo({ produtos }: CatalogoProps) {
         {produtos.map((produto: any, idx: number) => (
           <div key={produto.id} className="bg-caramelo rounded-xl p-6 flex flex-col items-center shadow">
             <Image
-              src={produto.image || "/placeholder.jpg"}
+              src={produto.images && produto.images.length > 0 ? produto.images[0].url : "/placeholder.jpg"}
               alt={produto.name}
               width={250}
               height={250}

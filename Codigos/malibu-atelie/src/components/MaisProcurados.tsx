@@ -16,7 +16,7 @@ export default function MaisProcurados({ produtos }: MaisProcuradosProps) {
         {produtos.map((produto: any) => (
           <div key={produto.id} className="bg-white rounded-xl p-4 flex-1 flex flex-col items-center shadow">
             <Image
-              src={produto.image || "/placeholder.jpg"}
+              src={produto.images && produto.images.length > 0 ? produto.images[0].url : "/placeholder.jpg"}
               alt={produto.name}
               width={200}
               height={200}

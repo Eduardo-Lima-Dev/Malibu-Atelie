@@ -90,7 +90,8 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { name, description, price, image, categoryId } = body
+    console.log('Body recebido:', body)
+    const { name, description, price, categoryId, images } = body
 
     if (!name || !description || !price || !categoryId) {
       return NextResponse.json(
@@ -99,9 +100,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // Converte categoryId para número
+    const categoryIdNumber = parseInt(categoryId as string, 10)
+    if (isNaN(categoryIdNumber)) {
+      return NextResponse.json(
+        { error: 'ID da categoria inválido' },
+        { status: 400 }
+      )
+    }
+
     // Verifica se a categoria existe
     const category = await prisma.category.findUnique({
-      where: { id: categoryId }
+      where: { id: categoryIdNumber }
     })
 
     console.log('Categoria encontrada:', category)
@@ -117,22 +127,39 @@ export async function POST(req: NextRequest) {
       name,
       description,
       price,
-      image,
-      categoryId,
-      userId: payload.id
+      categoryId: categoryIdNumber,
+      userId: payload.id,
+      images: images
     })
+
+    console.log('Estrutura das imagens:', images)
+    console.log('Tipo das imagens:', typeof images)
+    console.log('É array?', Array.isArray(images))
+
+    const imagesData = images && Array.isArray(images) ? {
+      create: images.map((img: any) => {
+        console.log('Processando imagem:', img)
+        return {
+          filename: img.filename,
+          url: img.url
+        }
+      })
+    } : undefined
+
+    console.log('Dados das imagens para criar:', imagesData)
 
     const product = await prisma.product.create({
       data: {
         name,
         description,
         price: new Decimal(price),
-        image,
-        categoryId,
-        userId: payload.id as number
+        categoryId: categoryIdNumber,
+        userId: payload.id as number,
+        images: imagesData
       },
       include: {
-        category: true
+        category: true,
+        images: true
       }
     })
 
@@ -204,7 +231,7 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { id, name, description, price, image, categoryId } = body
+    const { id, name, description, price, categoryId } = body
 
     if (!id) {
       return NextResponse.json(
@@ -249,7 +276,6 @@ export async function PUT(req: NextRequest) {
         name: name || undefined,
         description: description || undefined,
         price: price ? new Decimal(price) : undefined,
-        image: image || undefined,
         categoryId: categoryId || undefined
       },
       include: {

@@ -1,12 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  //output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -20,25 +13,24 @@ model User {
   email         String    @unique
   password      String
   emailVerified DateTime?
-  image         String?   
+  image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   products      Product[]
 }
 
 model Product {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  description String
-  price       Decimal   @db.Decimal(10,2)
-  image       String?
-  category    Category  @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  images      Image[]
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  categoryId  Int
+  createdAt   DateTime @default(now())
+  description String
+  price       Decimal  @db.Decimal(10, 2)
+  updatedAt   DateTime @updatedAt
+  images      Image[]
+  category    Category @relation(fields: [categoryId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([categoryId])
@@ -47,19 +39,16 @@ model Product {
 model Category {
   id        Int       @id @default(autoincrement())
   name      String
-  products  Product[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  products  Product[]
 }
 
 model Image {
   id        Int      @id @default(autoincrement())
   url       String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([productId])
+  filename  String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
-

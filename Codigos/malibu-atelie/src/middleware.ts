@@ -10,6 +10,9 @@ export async function middleware(request: NextRequest) {
   const isProductRoute = request.nextUrl.pathname.startsWith('/api/products')
   const isProductGet = isProductRoute && request.method === 'GET'
   
+  // Liberar rota de upload
+  const isUploadRoute = request.nextUrl.pathname.startsWith('/api/upload')
+  
   // Verifica se a rota atual precisa de autenticação
   const isProtectedRoute = protectedRoutes.some(route => 
     request.nextUrl.pathname.startsWith(route)
@@ -18,6 +21,10 @@ export async function middleware(request: NextRequest) {
   console.log('Rota:', request.nextUrl.pathname)
   console.log('Método:', request.method)
   console.log('Protegida:', isProtectedRoute)
+
+  if (isUploadRoute) {
+    return NextResponse.next();
+  }
 
   if (isProtectedRoute) {
     const authHeader = request.headers.get('authorization')

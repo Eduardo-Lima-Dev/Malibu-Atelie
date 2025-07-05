@@ -17,7 +17,7 @@ export default function Hero({ produtos }: HeroProps) {
           {[0, 1, 2].map((i) => (
             <div key={i} className="relative w-1/3 h-full">
               <Image
-                src={produtos[i]?.image || `/img${i + 1}.jpg`}
+                src={produtos[i]?.images && produtos[i].images.length > 0 ? produtos[i].images[0].url : `/img${i + 1}.jpg`}
                 alt={`Modelo ${i + 1}`}
                 fill
                 className="object-cover h-full w-full"
@@ -30,7 +30,7 @@ export default function Hero({ produtos }: HeroProps) {
           {[0, 1, 2].map((i) => (
             <div key={i} className="relative flex-1 h-full">
               <Image
-                src={produtos[i]?.image || `/img${i + 1}.jpg`}
+                src={produtos[i]?.images && produtos[i].images.length > 0 ? produtos[i].images[0].url : `/img${i + 1}.jpg`}
                 alt={`Modelo ${i + 1}`}
                 fill
                 className="object-cover h-full w-full rounded-lg"
