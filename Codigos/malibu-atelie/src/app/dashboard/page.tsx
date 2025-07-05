@@ -140,7 +140,8 @@ export default function DashboardPage() {
                           <img
                             src={produto.images[0].url}
                             alt={produto.name}
-                            className="w-16 h-16 object-cover rounded"
+                            className="w-16 h-20 object-cover rounded"
+                            style={{ aspectRatio: '1080/1350' }}
                           />
                         ) : (
                           <span className="text-gray-400 italic">Sem imagem</span>

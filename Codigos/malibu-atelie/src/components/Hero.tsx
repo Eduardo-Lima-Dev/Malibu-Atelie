@@ -22,6 +22,7 @@ export default function Hero({ produtos }: HeroProps) {
                 fill
                 className="object-cover h-full w-full"
                 sizes="(max-width: 1100px) 33vw, 363px"
+                style={{ aspectRatio: '1080/1350' }}
               />
             </div>
           ))}
@@ -35,6 +36,7 @@ export default function Hero({ produtos }: HeroProps) {
                 fill
                 className="object-cover h-full w-full rounded-lg"
                 sizes="33vw"
+                style={{ aspectRatio: '1080/1350' }}
               />
             </div>
           ))}
