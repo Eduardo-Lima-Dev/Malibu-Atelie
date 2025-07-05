@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     domains: [
       "crocheparavendermais.com",
+      "xcrmutztexhdxlknxsqx.supabase.co",
       // adicione outros domínios se necessário
     ],
   },
