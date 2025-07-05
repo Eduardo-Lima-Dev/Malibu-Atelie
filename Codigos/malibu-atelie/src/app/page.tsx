@@ -1,3 +1,5 @@
+"use client"
+
 import { getProdutos } from "@/lib/api";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
