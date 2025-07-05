@@ -25,19 +25,31 @@ async function verifyToken(token: string) {
 
 // Listar todos os produtos
 export async function GET(req: NextRequest) {
+  console.log('=== INÍCIO DO ENDPOINT GET /api/products ===')
   try {
+    console.log('Tentando conectar ao Prisma...')
     const products = await prisma.product.findMany({
       include: {
         category: true,
         images: true
       }
     })
-
+    console.log('Produtos encontrados:', products.length)
+    console.log('=== FIM DO ENDPOINT GET /api/products (SUCESSO) ===')
     return NextResponse.json(products)
   } catch (error) {
-    console.error('Erro ao buscar produtos:', error)
+    console.error('=== ERRO NO ENDPOINT GET /api/products ===')
+    console.error('Tipo do erro:', typeof error)
+    console.error('Erro completo:', error)
+    console.error('Mensagem do erro:', error instanceof Error ? error.message : 'Erro sem mensagem')
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'Sem stack trace')
+    console.error('=== FIM DO ENDPOINT GET /api/products (ERRO) ===')
+    
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { 
+        error: 'Erro interno do servidor',
+        details: error instanceof Error ? error.message : 'Erro desconhecido'
+      },
       { status: 500 }
     )
   }
