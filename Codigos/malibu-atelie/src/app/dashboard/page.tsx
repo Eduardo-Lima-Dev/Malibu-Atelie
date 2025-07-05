@@ -104,7 +104,7 @@ export default function DashboardPage() {
       <aside className="bg-white border-b md:border-b-0 md:border-r w-full md:w-64 flex flex-row md:flex-col gap-4 md:gap-8 p-4 md:p-8 items-center md:items-start justify-between md:justify-start">
         <div className="text-2xl font-bold mb-0 md:mb-8">Malibu Ateliê</div>
         <nav className="flex flex-row md:flex-col gap-4 w-full md:w-auto justify-end md:justify-start">
-          <a href="/dashboard" className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0">
+          <a href="/" className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0">
             <FiHome size={20} /> <span className="hidden sm:inline">Dashboard</span>
           </a>
           <button type="button" onClick={() => { setProdutoEdicao(null); setModalOpen(true); }} className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0 w-full md:w-auto">

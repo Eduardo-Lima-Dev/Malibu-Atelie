@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import fs from 'fs';
+import path from 'path';
 
 export const config = {
   api: {
@@ -8,7 +10,8 @@ export const config = {
 };
 
 export async function POST(req: NextRequest) {
-  console.log('=== INÍCIO DO UPLOAD ===');
+  const useSupabase = process.env.USE_SUPABASE === 'true';
+
   try {
     const formData = await req.formData();
     const file = formData.get('file') as File;
@@ -37,36 +40,50 @@ export async function POST(req: NextRequest) {
     console.log('Nome do arquivo:', fileName);
     console.log('Tamanho do buffer:', buffer.length);
     
-    // Upload para o Supabase Storage
-    const { data, error } = await supabase.storage
-      .from('product-images')
-      .upload(fileName, buffer, {
-        contentType: file.type,
-        cacheControl: '3600',
-        upsert: false
-      });
+    if (useSupabase) {
+      // Upload para Supabase
+      const { data, error } = await supabase.storage
+        .from('product-images')
+        .upload(fileName, buffer, {
+          contentType: file.type,
+          cacheControl: '3600',
+          upsert: false
+        });
 
-    if (error) {
-      console.error('Erro no upload do Supabase:', error);
-      return NextResponse.json({ 
-        error: 'Erro ao fazer upload',
-        details: error.message 
-      }, { status: 500 });
+      if (error) {
+        console.error('Erro no upload do Supabase:', error);
+        return NextResponse.json({ 
+          error: 'Erro ao fazer upload',
+          details: error.message 
+        }, { status: 500 });
+      }
+
+      console.log('Upload realizado com sucesso, gerando URL pública...');
+
+      // Gerar URL pública da imagem
+      const { data: urlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(fileName);
+
+      const url = urlData.publicUrl;
+      
+      console.log('URL pública gerada:', url);
+      console.log('=== FIM DO UPLOAD (SUCESSO) ===');
+      
+      return NextResponse.json({ url });
+    } else {
+      // Upload local (apenas para desenvolvimento)
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      const filePath = path.join(uploadDir, fileName);
+      fs.writeFileSync(filePath, buffer);
+
+      // URL local para acessar a imagem
+      const url = `/uploads/${fileName}`;
+      return NextResponse.json({ url });
     }
-
-    console.log('Upload realizado com sucesso, gerando URL pública...');
-
-    // Gerar URL pública da imagem
-    const { data: urlData } = supabase.storage
-      .from('product-images')
-      .getPublicUrl(fileName);
-
-    const url = urlData.publicUrl;
-    
-    console.log('URL pública gerada:', url);
-    console.log('=== FIM DO UPLOAD (SUCESSO) ===');
-    
-    return NextResponse.json({ url });
   } catch (error) {
     console.error('=== ERRO NO UPLOAD ===');
     console.error('Tipo do erro:', typeof error);
