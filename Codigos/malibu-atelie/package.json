@@ -11,7 +11,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:setup": "./scripts/setup-test-db.sh",
-    "test:all": "npm run test:setup && npm test"
+    "test:all": "npm run test:setup && npm test",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.9.1",
