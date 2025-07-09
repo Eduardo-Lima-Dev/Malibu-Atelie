@@ -50,7 +50,7 @@ export default function CatalogoPage() {
           </h1>
           {/* Filtro */}
           <select
-            className="border border-marrom rounded px-3 py-2 text-marrom bg-white font-semibold w-full md:w-auto md:order-3"
+            className="border border-marrom rounded-full px-3 py-2 text-marrom bg-[#F4EDE4] font-semibold w-full md:w-auto md:order-3"
             value={sort}
             onChange={e => setSort(e.target.value)}
           >
