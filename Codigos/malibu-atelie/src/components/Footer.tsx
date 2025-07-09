@@ -11,7 +11,7 @@ export default function Footer() {
           <img src="/assets/icon-instagram.svg" alt="Instagram" width={24} />
         </a>
         <a 
-          href="https://wa.me/8994664958?text=Olá, gostaria de fazer um orçamento" 
+          href="https://wa.me/558994129483?text=Olá, gostaria de fazer um orçamento" 
           target="_blank" 
           rel="noopener noreferrer"
           aria-label="WhatsApp"

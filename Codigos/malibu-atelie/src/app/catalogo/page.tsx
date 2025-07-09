@@ -74,7 +74,7 @@ export default function CatalogoPage() {
                 <p className="text-marrom text-sm mb-3 line-clamp-3">{produto.description}</p>
                 <div className="text-marrom text-lg font-semibold mb-3">R$ {Number(produto.price).toFixed(2)}</div>
                 <a 
-                  href={`https://wa.me/8994664958?text=Olá, gostaria de encomendar ${encodeURIComponent(produto.name)}`}
+                  href={`https://wa.me/558994129483?text=Olá, gostaria de encomendar ${encodeURIComponent(produto.name)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-[#8B4513] text-white px-4 py-2 rounded-full font-semibold hover:bg-[#A0522D] transition text-center inline-block w-full"

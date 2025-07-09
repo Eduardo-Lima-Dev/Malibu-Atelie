@@ -12,14 +12,14 @@ const menuItems: SidebarMenuItem[] = [
       <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M3 12h18M3 6h18M3 18h18" /></svg>
     ),
     label: "Home",
-    href: "#"
+    href: "/"
   },
   {
     icon: (
-      <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="11" cy="11" r="8" /><path d="M8 11h6M11 8v6" /></svg>
+      <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 11V7a4 4 0 0 0-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
     ),
-    label: "Encomendar",
-    href: "#"
+    label: "Catálogo",
+    href: "/catalogo"
   }
 ];
 
@@ -51,7 +51,7 @@ export default function Header() {
       </nav>
       <div className="flex items-center gap-4 text-marrom">
         <a
-          href="https://wa.me/8994664958?text=Olá, gostaria de fazer um orçamento"
+          href="https://wa.me/558994129483?text=Olá, gostaria de fazer um orçamento"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"
