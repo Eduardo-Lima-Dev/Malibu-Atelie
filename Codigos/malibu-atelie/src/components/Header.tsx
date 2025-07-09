@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import SidebarMenu from "@/components/SidebarMenu";
 import { SidebarMenuItem } from "@/types/sidebar";
 
@@ -24,6 +25,7 @@ const menuItems: SidebarMenuItem[] = [
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header
@@ -34,8 +36,18 @@ export default function Header() {
         <Image src="/assets/logo-maliibu.svg" alt="Malibu Ateliê" width={220} height={48} priority />
       </div>
       <nav className="hidden md:flex gap-8 text-marrom font-poppins text-base font-normal opacity-70">
-        <a href="#">Home</a>
-        <a href="#">Encomendar</a>
+        <a 
+          href="/" 
+          className={`hover:opacity-100 transition-opacity ${pathname === "/" ? "opacity-100 font-semibold" : ""}`}
+        >
+          Home
+        </a>
+        <a 
+          href="/catalogo" 
+          className={`hover:opacity-100 transition-opacity ${pathname === "/catalogo" ? "opacity-100 font-semibold" : ""}`}
+        >
+          Catálogo
+        </a>
       </nav>
       <div className="flex items-center gap-4 text-marrom">
         <a
