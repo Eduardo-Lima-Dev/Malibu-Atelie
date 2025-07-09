@@ -105,7 +105,7 @@ export default function DashboardPage() {
         <div className="text-2xl font-bold mb-0 md:mb-8">Malibu Ateliê</div>
         <nav className="flex flex-row md:flex-col gap-4 w-full md:w-auto justify-end md:justify-start">
           <a href="/" className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0">
-            <FiHome size={20} /> <span className="hidden sm:inline">Dashboard</span>
+            <FiHome size={20} /> <span className="hidden sm:inline">Home</span>
           </a>
           <button type="button" onClick={() => { setProdutoEdicao(null); setModalOpen(true); }} className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0 w-full md:w-auto">
             <FiPlusCircle size={20} /> <span className="hidden sm:inline">Cadastrar Produto</span>

@@ -205,36 +205,31 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       )
     }
 
-    // Verifica se a categoria existe (se foi fornecida)
-    if (categoryId) {
-      const category = await prisma.category.findUnique({
-        where: { id: categoryId }
-      })
+    // Antes de atualizar, remova as imagens antigas
+    await prisma.image.deleteMany({
+      where: { productId: productId }
+    });
 
-      console.log('Categoria encontrada:', category)
-
-      if (!category) {
-        return NextResponse.json(
-          { error: 'Categoria não encontrada' },
-          { status: 404 }
-        )
-      }
-    }
-
-    // Atualiza o produto
+    // Atualiza o produto e cria as novas imagens
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
         name: name || undefined,
         description: description || undefined,
         price: price ? new Decimal(price) : undefined,
-        categoryId: categoryId || undefined
+        categoryId: categoryId || undefined,
+        images: {
+          create: (body.images || []).map((img: any) => ({
+            url: img.url,
+            filename: img.filename,
+          })),
+        },
       },
       include: {
         category: true,
         images: true
       }
-    })
+    });
 
     console.log('Produto atualizado:', updatedProduct)
 

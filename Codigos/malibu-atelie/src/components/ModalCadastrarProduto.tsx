@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from 'react'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiTrash2 } from 'react-icons/fi'
 
 interface Categoria {
   id: number
@@ -14,6 +14,7 @@ interface ProdutoEdicao {
   description?: string
   price: number | string
   categoryId?: number
+  images?: { filename: string, url: string }[] // Adicionado para suportar imagens no produtoEdicao
 }
 
 interface ModalCadastrarProdutoProps {
@@ -48,7 +49,6 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
       buscarCategorias()
       setShowCriarCategoria(false)
       setFileName(null)
-      setImages([])
       if (produtoEdicao) {
         setForm({
           name: produtoEdicao.name || '',
@@ -56,11 +56,15 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
           price: String(produtoEdicao.price ?? ''),
           categoryId: produtoEdicao.categoryId ? String(produtoEdicao.categoryId) : ''
         })
-        // Para edição, vamos carregar as imagens do produto se existirem
-        // Por enquanto, vamos deixar vazio até implementar a busca das imagens
-        setImages([])
+        // Carregar imagem existente ao editar
+        if ((produtoEdicao as any).images && (produtoEdicao as any).images.length > 0) {
+          setImages((produtoEdicao as any).images)
+        } else {
+          setImages([])
+        }
       } else {
         setForm({ name: '', description: '', price: '', categoryId: '' })
+        setImages([])
       }
     }
   }, [open, produtoEdicao])
@@ -124,6 +128,7 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
       let res
       const body = {
         ...form,
+        categoryId: form.categoryId ? Number(form.categoryId) : undefined,
         images,
       }
       if (produtoEdicao) {
@@ -195,62 +200,67 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Imagem</label>
-            <label
-              className="flex flex-col items-center justify-center border-2 border-dashed border-[#3d4fc5] rounded-lg p-4 cursor-pointer hover:bg-[#f5f7ff] transition"
-              htmlFor="file-upload"
-            >
-              <FiPlus size={32} className="text-[#3d4fc5] mb-2" />
-              <span className="text-[#3d4fc5] font-medium">
-                Clique para selecionar uma imagem
-              </span>
-              <input
-                ref={inputFileRef}
-                id="file-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onClick={e => { (e.target as HTMLInputElement).value = ''; }}
-                onChange={async (e) => {
-                  console.log('onChange disparado', e.target.files);
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  setUploading(true);
-                  const formData = new FormData();
-                  formData.append('file', file);
-                  console.log('Antes do fetch');
-                  const res = await fetch('/api/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+            {images.length > 0 ? (
+              <div className="flex flex-col items-center mt-2 relative">
+                <img
+                  src={images[0].url}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded border mb-2"
+                />
+                <button
+                  type="button"
+                  className="absolute top-0 right-0 bg-white rounded-full p-1 shadow hover:bg-red-100"
+                  title="Remover imagem"
+                  onClick={() => setImages([])}
+                >
+                  <FiTrash2 className="text-red-500" size={20} />
+                </button>
+                {fileName && (
+                  <span className="text-xs text-gray-600">{fileName}</span>
+                )}
+              </div>
+            ) : (
+              <label
+                className="flex flex-col items-center justify-center border-2 border-dashed border-[#3d4fc5] rounded-lg p-4 cursor-pointer hover:bg-[#f5f7ff] transition"
+                htmlFor="file-upload"
+              >
+                <FiPlus size={32} className="text-[#3d4fc5] mb-2" />
+                <span className="text-[#3d4fc5] font-medium">
+                  Clique para selecionar uma imagem
+                </span>
+                <input
+                  ref={inputFileRef}
+                  id="file-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onClick={e => { (e.target as HTMLInputElement).value = ''; }}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploading(true);
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await fetch('/api/upload', {
+                      method: 'POST',
+                      body: formData,
+                      headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                      }
+                    });
+                    const data = await res.json();
+                    if (data.url) {
+                      setFileName(file.name);
+                      setImages([{ filename: file.name, url: data.url }]); // sobrescreve!
+                    } else {
+                      setErro('Erro ao fazer upload da imagem.');
                     }
-                  });
-                  console.log('Depois do fetch');
-                  const data = await res.json();
-                  console.log('Upload response:', data);
-                  if (data.url) {
-                    setFileName(file.name);
-                    setImages(imgs => [...imgs, { filename: file.name, url: data.url }]);
-                  } else {
-                    setErro('Erro ao fazer upload da imagem.');
-                  }
-                  setUploading(false);
-                }}
-              />
-              {uploading && <span className="text-xs text-gray-500 mt-2">Enviando imagem...</span>}
-              {images.length > 0 && (
-                <div className="flex flex-col items-center mt-4">
-                  <img
-                    src={images[0].url}
-                    alt="Preview"
-                    className="w-32 h-32 object-cover rounded border mb-2"
-                  />
-                  {fileName && (
-                    <span className="text-xs text-gray-600">{fileName}</span>
-                  )}
-                </div>
-              )}
-            </label>
+                    setUploading(false);
+                  }}
+                />
+                {uploading && <span className="text-xs text-gray-500 mt-2">Enviando imagem...</span>}
+              </label>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Categoria</label>
