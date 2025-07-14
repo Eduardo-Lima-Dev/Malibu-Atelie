@@ -51,7 +51,7 @@ export default function Header() {
       </nav>
       <div className="flex items-center gap-4 text-marrom">
         <a
-          href="https://wa.me/558994129483?text=Olá, gostaria de fazer um orçamento"
+          href="https://wa.me/558994664958?text=Olá, gostaria de fazer um orçamento"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="WhatsApp"
