@@ -18,13 +18,13 @@ export default function MaisProcurados({ produtos }: MaisProcuradosProps) {
         {produtos.map((produto: any) => (
           <div key={produto.id} className="bg-white rounded-xl p-3 flex flex-col items-center shadow w-full">
             <div className="relative w-full aspect-square mb-2">
-              <Image
-                src={produto.images && produto.images.length > 0 ? produto.images[0].url : "/placeholder.jpg"}
-                alt={produto.name}
+            <Image
+              src={produto.images && produto.images.length > 0 ? produto.images[0].url : "/placeholder.jpg"}
+              alt={produto.name}
                 fill
                 className="rounded-lg object-cover w-full h-full"
                 sizes="(max-width: 768px) 100vw, 400px"
-              />
+            />
             </div>
             <div className="mt-2 font-poppins text-marrom text-center text-base md:text-lg">{produto.name}</div>
             <div className="text-marrom text-center text-sm">R$ {Number(produto.price).toFixed(2)}</div>

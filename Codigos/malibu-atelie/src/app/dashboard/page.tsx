@@ -1,10 +1,12 @@
 "use client"
 
-import { FiHome, FiBox, FiPlusCircle, FiEdit, FiTrash2, FiLogOut } from 'react-icons/fi'
+import { FiHome, FiBox, FiPlusCircle, FiEdit, FiTrash2, FiLogOut, FiMenu } from 'react-icons/fi'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Paginacao from '@/components/Paginacao'
 import ModalCadastrarProduto from '@/components/ModalCadastrarProduto'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Produto {
   id: number
@@ -42,6 +44,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false)
   const [modalConfirmOpen, setModalConfirmOpen] = useState(false)
   const [produtoExcluir, setProdutoExcluir] = useState<Produto | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   async function fetchProdutos() {
     setLoading(true)
@@ -49,10 +52,18 @@ export default function DashboardPage() {
       const res = await fetch('/api/products', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
       })
+      if (res.status === 401 || res.status === 403) {
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        setProdutos([])
+        setLoading(false)
+        setTimeout(() => router.push('/login'), 2000)
+        return
+      }
       if (!res.ok) throw new Error('Erro ao buscar produtos')
       const data = await res.json()
       setProdutos(data)
     } catch (e) {
+      toast.error('Erro ao buscar produtos. Tente novamente.')
       setProdutos([])
     } finally {
       setLoading(false)
@@ -90,33 +101,78 @@ export default function DashboardPage() {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
       })
+      if (res.status === 401 || res.status === 403) {
+        toast.error('Sua sessão expirou. Faça login novamente.')
+        setModalConfirmOpen(false)
+        setProdutoExcluir(null)
+        setTimeout(() => router.push('/login'), 2000)
+        return
+      }
       if (!res.ok) throw new Error('Erro ao excluir produto')
+      toast.success('Produto excluído com sucesso!')
       setModalConfirmOpen(false)
       setProdutoExcluir(null)
       fetchProdutos()
     } catch (e) {
-      alert('Erro ao excluir produto')
+      toast.error('Erro ao excluir produto. Tente novamente.')
     }
   }
 
   return (
     <div className="min-h-screen bg-[#f8fafd] flex flex-col md:flex-row">
-      <aside className="bg-white border-b md:border-b-0 md:border-r w-full md:w-64 flex flex-row md:flex-col gap-4 md:gap-8 p-4 md:p-8 items-center md:items-start justify-between md:justify-start">
-        <div className="text-2xl font-bold mb-0 md:mb-8">Malibu Ateliê</div>
-        <nav className="flex flex-row md:flex-col gap-4 w-full md:w-auto justify-end md:justify-start">
-          <a href="/" className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0">
-            <FiHome size={20} /> <span className="hidden sm:inline">Home</span>
-          </a>
-          <button type="button" onClick={() => { setProdutoEdicao(null); setModalOpen(true); }} className="flex items-center gap-2 text-marrom py-2 hover:bg-caramelo rounded transition px-2 md:px-0 w-full md:w-auto">
-            <FiPlusCircle size={20} /> <span className="hidden sm:inline">Cadastrar Produto</span>
+      {/* Header fixo mobile */}
+      <header className="fixed top-0 left-0 right-0 z-30 bg-white shadow-sm md:hidden px-2">
+        <div className="flex items-center justify-between p-4">
+          <h1 className="text-xl font-bold text-marrom">Malibu Ateliê</h1>
+          <button
+            className="bg-gray-200 p-2 rounded-full"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Abrir menu"
+          >
+            <FiMenu size={24} className="text-marrom" />
           </button>
-          <button type="button" onClick={handleLogout} className="flex items-center gap-2 text-marrom py-2 hover:bg-red-100 rounded transition px-2 md:px-0 w-full md:w-auto">
-            <FiLogOut size={20} /> <span className="hidden sm:inline">Logout</span>
+        </div>
+      </header>
+      {/* Sidebar drawer mobile */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          {/* Overlay */}
+          <div className="flex-1 bg-black/40" onClick={() => setSidebarOpen(false)} />
+          {/* Sidebar */}
+          <aside className="w-64 bg-white h-full flex flex-col items-center py-6 shadow-2xl">
+            <div className="text-2xl font-bold mb-8">Malibu Ateliê</div>
+            <nav className="flex flex-col gap-4 w-full px-6">
+              <a href="/" className="flex items-center gap-3 text-marrom py-2 hover:bg-caramelo rounded transition text-left w-full px-4 text-base" onClick={() => setSidebarOpen(false)}>
+                <FiHome size={20} /> <span>Home</span>
+              </a>
+              <button type="button" onClick={() => { setProdutoEdicao(null); setModalOpen(true); setSidebarOpen(false); }} className="flex items-center gap-3 text-marrom py-2 hover:bg-caramelo rounded transition text-left w-full px-4 text-base">
+                <FiPlusCircle size={20} /> <span>Cadastrar Produto</span>
+              </button>
+              <button type="button" onClick={() => { handleLogout(); setSidebarOpen(false); }} className="flex items-center gap-3 text-marrom py-2 hover:bg-red-100 rounded transition text-left w-full px-4 text-base">
+                <FiLogOut size={20} /> <span>Logout</span>
+              </button>
+            </nav>
+          </aside>
+        </div>
+      )}
+      {/* Sidebar desktop sempre visível e igual ao layout original */}
+      <aside className="hidden md:flex bg-white border-b md:border-b-0 md:border-r w-64 flex-col gap-8 p-8 items-start justify-start">
+        <div className="text-2xl font-bold mb-8">Malibu Ateliê</div>
+        <nav className="flex flex-col gap-4 w-full">
+          <a href="/" className="flex items-center gap-3 text-marrom py-2 hover:bg-caramelo rounded transition text-left w-full px-4 text-base">
+            <FiHome size={20} /> <span>Home</span>
+          </a>
+          <button type="button" onClick={() => { setProdutoEdicao(null); setModalOpen(true); }} className="flex items-center gap-3 text-marrom py-2 hover:bg-caramelo rounded transition text-left w-full px-4 text-base">
+            <FiPlusCircle size={20} /> <span>Cadastrar Produto</span>
+          </button>
+          <button type="button" onClick={handleLogout} className="flex items-center gap-3 text-marrom py-2 hover:bg-red-100 rounded transition text-left w-full px-4 text-base">
+            <FiLogOut size={20} /> <span>Logout</span>
           </button>
         </nav>
       </aside>
-      <main className="flex-1 p-4 md:p-8">
-        <div className="bg-white rounded-xl shadow p-4 md:p-8 overflow-x-auto">
+      {/* Conteúdo principal */}
+      <main className="flex-1 p-4 md:p-8 pt-24">
+        <div className="bg-white rounded-xl shadow p-2 md:p-8 overflow-x-auto">
           <h2 className="text-2xl font-bold mb-4">Lista de Produtos</h2>
           {loading ? (
             <div className="text-center text-gray-500 py-8">Carregando produtos...</div>
@@ -174,6 +230,7 @@ export default function DashboardPage() {
         </div>
         <ModalCadastrarProduto open={modalOpen} onClose={handleFecharModal} onProdutoCriado={fetchProdutos} produtoEdicao={produtoEdicao} />
         <ModalConfirmarExclusao open={modalConfirmOpen} onClose={() => { setModalConfirmOpen(false); setProdutoExcluir(null); }} onConfirm={handleExcluirProduto} produto={produtoExcluir} />
+        <ToastContainer position="top-center" autoClose={4000} hideProgressBar={false} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover />
       </main>
     </div>
   )

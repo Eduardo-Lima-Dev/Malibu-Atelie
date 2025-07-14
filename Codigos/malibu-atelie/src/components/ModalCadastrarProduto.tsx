@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { FiPlus, FiTrash2 } from 'react-icons/fi'
+import { toast } from 'react-toastify';
 
 interface Categoria {
   id: number
@@ -60,7 +61,7 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
         if ((produtoEdicao as any).images && (produtoEdicao as any).images.length > 0) {
           setImages((produtoEdicao as any).images)
         } else {
-          setImages([])
+        setImages([])
         }
       } else {
         setForm({ name: '', description: '', price: '', categoryId: '' })
@@ -120,7 +121,7 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
     setErro('')
     setSucesso('')
     if (images.length === 0) {
-      setErro('Selecione uma imagem para o produto.')
+      toast.error('Selecione uma imagem para o produto.')
       setLoading(false)
       return
     }
@@ -153,12 +154,13 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
         })
       }
       if (!res.ok) throw new Error(produtoEdicao ? 'Erro ao editar produto' : 'Erro ao criar produto')
-      setSucesso(produtoEdicao ? 'Produto editado com sucesso!' : 'Produto cadastrado com sucesso!')
+      toast.success(produtoEdicao ? 'Produto editado com sucesso!' : 'Produto cadastrado com sucesso!')
+      onClose();
       setForm({ name: '', description: '', price: '', categoryId: '' })
       setImages([])
       onProdutoCriado?.()
     } catch (e) {
-      setErro(produtoEdicao ? 'Erro ao editar produto' : 'Erro ao criar produto')
+      toast.error(produtoEdicao ? 'Erro ao editar produto' : 'Erro ao criar produto')
     } finally {
       setLoading(false)
     }
@@ -220,46 +222,46 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
                 )}
               </div>
             ) : (
-              <label
-                className="flex flex-col items-center justify-center border-2 border-dashed border-[#3d4fc5] rounded-lg p-4 cursor-pointer hover:bg-[#f5f7ff] transition"
-                htmlFor="file-upload"
-              >
-                <FiPlus size={32} className="text-[#3d4fc5] mb-2" />
-                <span className="text-[#3d4fc5] font-medium">
-                  Clique para selecionar uma imagem
-                </span>
-                <input
-                  ref={inputFileRef}
-                  id="file-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onClick={e => { (e.target as HTMLInputElement).value = ''; }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setUploading(true);
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    const res = await fetch('/api/upload', {
-                      method: 'POST',
-                      body: formData,
-                      headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-                      }
-                    });
-                    const data = await res.json();
-                    if (data.url) {
-                      setFileName(file.name);
-                      setImages([{ filename: file.name, url: data.url }]); // sobrescreve!
-                    } else {
-                      setErro('Erro ao fazer upload da imagem.');
+            <label
+              className="flex flex-col items-center justify-center border-2 border-dashed border-[#3d4fc5] rounded-lg p-4 cursor-pointer hover:bg-[#f5f7ff] transition"
+              htmlFor="file-upload"
+            >
+              <FiPlus size={32} className="text-[#3d4fc5] mb-2" />
+              <span className="text-[#3d4fc5] font-medium">
+                Clique para selecionar uma imagem
+              </span>
+              <input
+                ref={inputFileRef}
+                id="file-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onClick={e => { (e.target as HTMLInputElement).value = ''; }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploading(true);
+                  const formData = new FormData();
+                  formData.append('file', file);
+                  const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                      'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                     }
-                    setUploading(false);
-                  }}
-                />
-                {uploading && <span className="text-xs text-gray-500 mt-2">Enviando imagem...</span>}
-              </label>
+                  });
+                  const data = await res.json();
+                  if (data.url) {
+                    setFileName(file.name);
+                      setImages([{ filename: file.name, url: data.url }]); // sobrescreve!
+                  } else {
+                    setErro('Erro ao fazer upload da imagem.');
+                  }
+                  setUploading(false);
+                }}
+              />
+              {uploading && <span className="text-xs text-gray-500 mt-2">Enviando imagem...</span>}
+            </label>
             )}
           </div>
           <div>
@@ -286,8 +288,6 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
               </div>
             ) : null}
           </div>
-          {erro && <div className="text-red-500 text-sm">{erro}</div>}
-          {sucesso && <div className="text-green-600 text-sm">{sucesso}</div>}
           <button type="submit" className="w-full bg-[#3d4fc5] text-white py-2 rounded mt-2" disabled={loading}>{loading ? (produtoEdicao ? 'Salvando...' : 'Cadastrando...') : (produtoEdicao ? 'Salvar Alterações' : 'Cadastrar Produto')}</button>
         </form>
       </div>
