@@ -26,9 +26,9 @@ export default function Paginacao({ paginaAtual, totalItens, itensPorPagina = 10
   }
 
   return (
-    <nav className="flex items-center justify-end gap-2 mt-8 select-none">
+    <nav className="flex flex-wrap items-center justify-center gap-2 mt-8 select-none">
       <button
-        className="px-2 py-1 rounded border text-gray-500 disabled:opacity-40"
+        className="px-2 py-1 rounded border border-marrom text-black disabled:opacity-40 bg-[#F4EDE4]"
         onClick={() => onChange(paginaAtual - 1)}
         disabled={paginaAtual === 1}
         aria-label="Página anterior"
@@ -39,18 +39,18 @@ export default function Paginacao({ paginaAtual, totalItens, itensPorPagina = 10
         typeof p === 'number' ? (
           <button
             key={p}
-            className={`px-3 py-1 rounded ${paginaAtual === p ? 'bg-[#3d4fc5] text-white' : 'bg-white text-gray-700 border'} font-medium`}
+            className={`px-3 py-1 rounded font-medium border border-marrom transition-colors duration-150 ${paginaAtual === p ? 'bg-black text-[#F4EDE4]' : 'bg-[#F4EDE4] text-marrom hover:bg-marrom hover:text-[#F4EDE4]'}`}
             onClick={() => onChange(p)}
             aria-current={paginaAtual === p ? 'page' : undefined}
           >
             {p}
           </button>
         ) : (
-          <span key={i} className="px-2 text-gray-400">...</span>
+          <span key={i} className="px-2 text-marrom">...</span>
         )
       )}
       <button
-        className="px-2 py-1 rounded border text-gray-500 disabled:opacity-40"
+        className="px-2 py-1 rounded border border-marrom text-black disabled:opacity-40 bg-[#F4EDE4]"
         onClick={() => onChange(paginaAtual + 1)}
         disabled={paginaAtual === totalPaginas}
         aria-label="Próxima página"

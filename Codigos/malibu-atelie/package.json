@@ -31,6 +31,7 @@
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",
     "react-toastify": "^11.0.5",
+    "selenium-webdriver": "^4.34.0",
     "zod": "^3.25.49"
   },
   "devDependencies": {
@@ -49,6 +50,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/supertest": "^6.0.2",
+    "chromedriver": "^138.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",
     "formidable": "^3.5.4",

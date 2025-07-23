@@ -4,10 +4,14 @@ import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getProdutos } from "@/lib/api";
+import Paginacao from "@/components/Paginacao";
 
 export default function CatalogoPage() {
   const [produtos, setProdutos] = useState<any[]>([]);
   const [sort, setSort] = useState<string>("none");
+  const [busca, setBusca] = useState("");
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const itensPorPagina = 10;
 
   useEffect(() => {
     async function fetchProdutos() {
@@ -17,26 +21,38 @@ export default function CatalogoPage() {
     fetchProdutos();
   }, []);
 
-  const sortedProdutos = [...produtos];
-  if (sort === "asc") {
-    sortedProdutos.sort((a, b) => a.price - b.price);
-  } else if (sort === "desc") {
-    sortedProdutos.sort((a, b) => b.price - a.price);
+  let filteredProdutos = [...produtos];
+  if (busca) {
+    filteredProdutos = filteredProdutos.filter(p => p.name.toLowerCase().includes(busca.toLowerCase()));
   }
+  if (sort === "asc") {
+    filteredProdutos.sort((a, b) => a.price - b.price);
+  } else if (sort === "desc") {
+    filteredProdutos.sort((a, b) => b.price - a.price);
+  }
+
+  const totalItens = filteredProdutos.length;
+  const startIdx = (paginaAtual - 1) * itensPorPagina;
+  const endIdx = startIdx + itensPorPagina;
+  const produtosPaginados = filteredProdutos.slice(startIdx, endIdx);
+
+  useEffect(() => {
+    setPaginaAtual(1);
+  }, [busca, sort]);
 
   return (
     <div className="min-h-screen font-poppins" style={{ background: "#F4EDE4" }}>
       <Header />
       <main className="px-4 py-8 md:px-8">
         <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-8">
-          {/* Botão Voltar */}
+
           <a
             href="/"
             className="text-marrom px-4 py-2 rounded-full font-semibold hover:bg-[#A0522D] transition w-max md:static md:order-1"
           >
             ← Voltar
           </a>
-          {/* Título centralizado */}
+
           <h1
             className="
               font-poppins text-3xl font-bold text-marrom
@@ -48,7 +64,6 @@ export default function CatalogoPage() {
           >
             Catálogo
           </h1>
-          {/* Filtro */}
           <select
             className="border border-marrom rounded-full px-3 py-2 text-marrom bg-[#F4EDE4] font-semibold w-full md:w-auto md:order-3"
             value={sort}
@@ -59,8 +74,17 @@ export default function CatalogoPage() {
             <option value="desc">Maior preço</option>
           </select>
         </div>
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Buscar produto pelo nome..."
+            value={busca}
+            onChange={e => setBusca(e.target.value)}
+            className="w-full border border-marrom rounded-full px-4 py-2 text-marrom bg-[#F4EDE4] font-semibold focus:outline-none focus:ring-2 focus:ring-marrom"
+          />
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
-          {sortedProdutos.map((produto: any) => (
+          {produtosPaginados.map((produto: any) => (
             <div key={produto.id} className="bg-white rounded-xl p-4 flex flex-col items-center shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative w-full aspect-square mb-4">
                 <img
@@ -85,6 +109,20 @@ export default function CatalogoPage() {
             </div>
           ))}
         </div>
+        {filteredProdutos.length === 0 && (
+          <div className="text-center text-marrom text-lg font-semibold mt-8">Produto não existe</div>
+        )}
+
+        {totalItens > itensPorPagina && (
+          <div className="flex justify-center mt-8">
+            <Paginacao
+              paginaAtual={paginaAtual}
+              totalItens={totalItens}
+              itensPorPagina={itensPorPagina}
+              onChange={setPaginaAtual}
+            />
+          </div>
+        )}
       </main>
       <Footer />
     </div>

@@ -253,7 +253,7 @@ export default function ModalCadastrarProduto({ open, onClose, onProdutoCriado, 
                   const data = await res.json();
                   if (data.url) {
                     setFileName(file.name);
-                      setImages([{ filename: file.name, url: data.url }]); // sobrescreve!
+                      setImages([{ filename: file.name, url: data.url }]);
                   } else {
                     setErro('Erro ao fazer upload da imagem.');
                   }
